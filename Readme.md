@@ -9,6 +9,19 @@ Using the MediaPipe pose detection models, train a custom model to recognize the
 ![YMCADance](./media/ymca_dance.gif)
 
 
+## Quick Start Setup (MacOS)
+
+When starting the pose predictions script for the first time, it might take 10-15 seconds to startup as it loads the necessarly libraries.  Subsequent executions will start faster.
+
+```shell
+git clone https://github.com/youngsoul/mediapipe-ymca.git
+cd mediapipe-ymca
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python 03_pose_predictions.py
+```
+
 Here are some examples of the iconic dance poses.
 
 ### Y
