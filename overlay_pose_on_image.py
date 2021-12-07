@@ -4,6 +4,13 @@ import argparse
 
 """
 Utility script to load an image and run it through the mediapipe models to draw any pose information
+
+Usage:
+
+python overlay_pose_on_image.py --image-path ./data/Y.png
+
+python overlay_pose_on_image.py --image-path ./data/Y.png --output-path ./data/Y-pose.png
+
 """
 
 mp_drawing = mp.solutions.drawing_utils  # Drawing helpers
