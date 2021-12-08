@@ -48,6 +48,8 @@ if __name__ == '__main__':
                     help="Image width")
     ap.add_argument("--add-dancers", action='store_true',
                     help="[Optional: False] add the rest of the virtual village people")
+    ap.add_argument("--add-counters", action='store_true',
+                    help="[Optional: False] if present should the pose counts ")
 
     args = vars(ap.parse_args())
     DEFAULT_IMAGE_WIDTH = args['image_width']
@@ -55,12 +57,20 @@ if __name__ == '__main__':
 
     model_name = args['model_name']
     suppress_landmarks = args['suppress_landmarks']
+    add_counters = args['add_counters']
 
     with open(f'{model_name}.pkl', 'rb') as f:
         model = joblib.load(f)
 
     cap = cv2.VideoCapture(0)
     # Initiate holistic model
+
+    y_counter = 0
+    m_counter = 0
+    c_counter = 0
+    a_counter = 0
+    last_detected_pose = None
+    number_of_new_pose_detections = 0
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
 
         while cap.isOpened():
@@ -123,8 +133,25 @@ if __name__ == '__main__':
                 body_language_prob = model.predict_proba(X)[0]
                 print(body_language_class, np.around(body_language_prob, decimals=3))
 
+                if add_counters:
+                    if last_detected_pose != body_language_class and np.around(np.max(body_language_prob),
+                                                                               decimals=3) > 0.999:
+                        print(last_detected_pose, body_language_class)
+                        last_detected_pose = body_language_class
+                        if body_language_class == 'Y':
+                            y_counter += 1
+                        elif body_language_class == 'M':
+                            m_counter += 1
+                        elif body_language_class == 'C':
+                            c_counter += 1
+                        elif body_language_class == 'A':
+                            a_counter += 1
+
                 # Get status box
-                cv2.rectangle(image, (0, 0), (250, 60), (245, 117, 16), -1)
+                status_width = 250
+                if add_counters:
+                    status_width = 500
+                cv2.rectangle(image, (0, 0), (status_width, 60), (245, 117, 16), -1)
 
                 # Display Class
                 cv2.putText(image, 'CLASS'
@@ -137,6 +164,45 @@ if __name__ == '__main__':
                             , (15, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
                 cv2.putText(image, str(round(body_language_prob[np.argmax(body_language_prob)], 2))
                             , (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+                if add_counters:
+                    # Display Y count
+                    count_x_start = 210
+                    count_x_offset = 50
+                    value_x_offset = 5
+
+                    count_x = count_x_start
+                    cv2.putText(image, 'Y'
+                                , (count_x, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+                    cv2.putText(image, str(y_counter)
+                                , (count_x - value_x_offset, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2,
+                                cv2.LINE_AA)
+
+                    count_x = count_x + count_x_offset
+                    # Display M count
+                    cv2.putText(image, 'M'
+                                , (count_x, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+                    cv2.putText(image, str(m_counter)
+                                , (count_x - value_x_offset, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2,
+                                cv2.LINE_AA)
+
+                    count_x = count_x + count_x_offset
+                    # Display C count
+                    cv2.putText(image, 'C'
+                                , (count_x, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+                    cv2.putText(image, str(c_counter)
+                                , (count_x - value_x_offset, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2,
+                                cv2.LINE_AA)
+
+                    count_x = count_x + count_x_offset
+                    # Display A count
+                    cv2.putText(image, 'A'
+                                , (count_x, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+                    cv2.putText(image, str(a_counter)
+                                , (count_x - value_x_offset, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2,
+                                cv2.LINE_AA)
+
+
 
             except Exception as exc:
                 print(f"{exc}")
