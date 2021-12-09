@@ -52,6 +52,13 @@ Here are some examples of the iconic dance poses.
 
 ![CapturePoses](./images/Y-before-after.png)
 
+### Machine Learning Process
+
+Below is a picture of the general flow of the Machine Learning Process
+
+![MLProc](./images/ymca-arch/ymca-arch.001.png)
+
+
 Sample captured data
 
 ```text
