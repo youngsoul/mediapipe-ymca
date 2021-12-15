@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
                 if add_counters:
                     if last_detected_pose != body_language_class and np.around(np.max(body_language_prob),
-                                                                               decimals=3) > 0.999:
+                                                                               decimals=3) > 0.700:
                         print(last_detected_pose, body_language_class)
                         last_detected_pose = body_language_class
                         if body_language_class == 'Y':
